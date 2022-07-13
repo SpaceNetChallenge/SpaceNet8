@@ -1,5 +1,8 @@
-# SpaceNet-8 Baseline
-Detecting flooded roads and buildings. Predicting road speed.
+# Algorithmic Baseline for SpaceNet 8 Flood Detection Challenge 
+
+
+Each year, natural disasters such as hurricanes, tornadoes, earthquakes and floods significantly damage infrastructure and result in loss of life, property and billions of dollars. As these events become more frequent and severe, there is an increasing need to rapidly develop maps and analyze the scale of destruction to better direct resources and first responders. To help address this need, the SpaceNet 8 Flood Detection Challenge will focus on infrastructure and flood mapping related to hurricanes and heavy rains that cause route obstructions and significant damage. The goal of SpaceNet 8 is to leverage the existing repository of datasets and algorithms from SpaceNet Challenges 1-7 (https://spacenet.ai/datasets/) and apply them to a real-world disaster response scenario, expanding to multiclass feature extraction and characterization for flooded roads and buildings and predicting road speed. 
+
 
 ### Setup
 1. Download this repo  
