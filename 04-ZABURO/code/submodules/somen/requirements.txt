@@ -1,0 +1,14 @@
+pysen[lint]
+pandas
+numpy
+tables
+torch
+scikit-learn
+pfio
+albumentations
+pytorch-pfn-extras
+torchvision
+feather-format
+dacite
+colorlog
+tqdm

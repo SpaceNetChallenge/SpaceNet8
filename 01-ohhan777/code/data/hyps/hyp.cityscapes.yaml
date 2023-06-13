@@ -1,0 +1,28 @@
+# KARI-AI 
+# Hyperparameters for COCO training from scratch (tentative)
+# python train.py --batch 40 --cfg yolov5m.yaml --weights '' --data coco.yaml --img 640 --epochs 300
+
+lr0: 0.01  # initial learning rate (SGD=1E-2, Adam=1E-3)
+poly_exp: 0.9  # exponent of Poly scheduler (1-epoch/epochs)^poly_exp
+momentum: 0.9  # SGD momentum/Adam beta1
+weight_decay: 0.0005  # optimizer weight decay 5e-4
+warmup_epochs: 3.7975  # warmup epochs (fractions ok)
+warmup_momentum: 0.9357  # warmup initial momentum
+warmup_bias_lr: 0.0654  # warmup initial bias lr
+fl_gamma: 0.0  # focal loss gamma (efficientDet default gamma=1.5)
+hsv_h: 0.01  # image HSV-Hue augmentation (fraction)
+hsv_s: 0.01  # image HSV-Saturation augmentation (fraction)
+hsv_v: 0.01  # image HSV-Value augmentation (fraction)
+degrees: 0.0  # image rotation (+/- deg)
+translate: 0.0  # image translation (+/- fraction)
+scale: 0.5  # image scale (+/- gain)
+crop_size: [512, 1024] # crop size (h, w)
+mean: [0.485, 0.456, 0.406]   # RGB mean
+std: [0.229, 0.224, 0.225]  # RGB std
+shear: 0.0  # image shear (+/- deg)
+perspective: 0.0  # image perspective (+/- fraction), range 0-0.001
+flipud: 0.0  # image flip up-down (probability)
+fliplr: 0.4  # image flip left-right (probability)
+mosaic: 0.0  # image mosaic (probability)
+mixup: 0.0  # image mixup (probability)
+copy_paste: 0.0  # segment copy-paste (probability)

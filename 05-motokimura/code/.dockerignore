@@ -1,0 +1,7 @@
+*
+!/docker/requirements.txt
+!/configs
+!/spacenet8_model
+!/tools
+!/test.sh
+!/train.sh

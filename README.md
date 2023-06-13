@@ -1,109 +1,50 @@
-# Algorithmic Baseline for SpaceNet 8 Flood Detection Challenge 
+# Winning Solutions and Baseline for SpaceNet 8 Flood Detection Challenge
 
+Each year, natural disasters such as hurricanes, tornadoes, earthquakes and floods significantly damage infrastructure and result in loss of life, property and billions of dollars. As these events become more frequent and severe, there is an increasing need to rapidly develop maps and analyze the scale of destruction to better direct resources and first responders. To help address this need, the SpaceNet 8 Flood Detection Challenge will focus on infrastructure and flood mapping related to hurricanes and heavy rains that cause route obstructions and significant damage. The goal of SpaceNet 8 is to leverage the existing repository of datasets and algorithms from SpaceNet Challenges 1-7 (https://spacenet.ai/datasets/) and apply them to a real-world disaster response scenario, expanding to multiclass feature extraction and characterization for flooded roads and buildings and predicting road speed.
 
-Each year, natural disasters such as hurricanes, tornadoes, earthquakes and floods significantly damage infrastructure and result in loss of life, property and billions of dollars. As these events become more frequent and severe, there is an increasing need to rapidly develop maps and analyze the scale of destruction to better direct resources and first responders. To help address this need, the SpaceNet 8 Flood Detection Challenge will focus on infrastructure and flood mapping related to hurricanes and heavy rains that cause route obstructions and significant damage. The goal of SpaceNet 8 is to leverage the existing repository of datasets and algorithms from SpaceNet Challenges 1-7 (https://spacenet.ai/datasets/) and apply them to a real-world disaster response scenario, expanding to multiclass feature extraction and characterization for flooded roads and buildings and predicting road speed. 
+## Top 5 winning solutions
+> highlights. You can find more detailed writeup in each of the subdirectories
+1. `./01-ohhan777`
+    - siamese HRNet+OCR
+    - data augmentation during training (motion blur, gaussian noise, hue and saturation shift, random brighness and contrast, random gamma)
+    - binary cross entropy loss for building segmentation, regional mutual information loss for road speed and flood segementation
+2. `./02-number13`
+    - pretrain U-Net (ResNet-50 encoder, initialized with ImageNet weights) on additional training data from spacenet-2 (buildings), -3 (roads), and -5 (roads) to predict roads and buildings. Use focal and dice loss.
+    - finetune the pretrained U-Net on spacenet-8 pre-event imagery and reference data.
+    - siamese U-Net (initialized using the pretrained U-Net weights) and train on spacenet-8 for flood and non-flood data.
+    - heuristic for flood attribution: if 30% of roads in image are flooded, all instances are assigned flood. if 50% of buildings in image are flooded, all instances of building are flooded.
+    - use focal and dice loss for segmentating flood and non-flood. Binary cross entropy loss to classify each whole image as 'flooded' or 'not-flooded'.
+    - same postprocessing as baseline
+3. `./03-sianalytics`
+    - pretrain with additional training data. spacenet-2 buildings, spacenet-3 roads, massachusetts buildings and roads, inria aerial image labeling dataset buildings.
+    - three independent models were used (building segmentation, road segmentation, and flood segmentation model)
+    - swin-transformer backbone (initialized with ImageNet-22K weights). UPerNet for the building and flood network decoder. Segformer used for road network decoder.
+    - focal loss + dice loss + lovasz loss 
+    - data augmentation during training
+    - same postprocessing as baseline - hyperparameters were adjusted
+4. `./04-ZABURO`
+    - use additional training data from spacenet-2 (buildings), spacenet-3 (roads), spacenet-5 (roads), and xBD dataset (for flood)
+    - For buildings and roads, train a U-Net with EffecientNet-V2 encoder
+    - For flood prediction, train a siamese U-Net with ResNet-50 encoder.
+    - same postprocessing as baseline. slight modifications for road network extraction
+5. `./05-motokimura`
+    - reviewed input data and excluded tiles with annotation errors. In cases where there were two post-event tiles, the lower quality image was excluded
+    - retiled the input data to gather more samples
+    - included auxiliary tasks during training of road junction prediction, building body prediction, building edge prediction, and building contact prediction
+    - ensemble for buildings, roads, and flood prediction
+        - U-Net with EfficientNet-B5 (predicting roads and buildings)
+        - U-Net with EfficientNet-B6 (predicting roads and buildings)
+        - Finetune the pretrained solution for SpaceNet-5 (predicting roads)
+        - Finetune the pretrained solution for xView-2 (predicting buildings)
+        - Siamese U-Net with EfficientNet-B5 (predicting flooded roads and buildings)
+        - Siamese U-Net with EfficientNet-B6 (predicting flooded roads and buildings)
+        - Finetune the pretrained solution for xView-2 (predicting flooded buildings)
+    - average and postprocess the results from the ensemble
+    - dice loss + binary cross entropy loss
+## Baseline
+1. `./baseline`
 
+### References and Resources 
+1. [R. Hänsch, J. Arndt, D. Lunga, M. Gibb, T. Pedelose, A. Boedihardjo, D. Petrie and T. M. Bacastow, "SpaceNet 8 - The Detection of Flooded Roads and Buildings", Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops, 2022, pp. 1472-1480.](https://openaccess.thecvf.com/content/CVPR2022W/EarthVision/papers/Hansch_SpaceNet_8_-_The_Detection_of_Flooded_Roads_and_Buildings_CVPRW_2022_paper.pdf)
 
-### Setup
-1. Download this repo  
-
-2. Build docker image  
-`nvidia-docker build -t sn8/baseline:1.0 /path/to/sn8_baseline/docker`
-
-3. Create and run the container (mount volumes to access your data, etc. see https://docs.docker.com/engine/reference/commandline/run/ for options)  
-`nvidia-docker run -it --rm sn8/baseline:1.0 bash`
-
-
-### Data Preparation
-Follow these steps to prepare data for training and validation. 
-
-1. Clean the geojson labels and add speed values to the roads based on road type, number of lanes, and surface type.  
-`python baseline/data_prep/geojson_prep.py --root_dir /path/to/spacenet8/aws/data/download --aoi_dirs Germany_Training_Public Louisiana-East_Training_Public`
-
-
-    The cleaning step here also catches geometry problems, makes a single commom schema, and moves roads and buildings to seperate geojsons/shps. It will output a few additional files that are used in the subsequent step for creating image masks. The following new files will be written to the AOI annotations directory:  
-        - `{AOI}/annotations/prepped_cleaned/roads_cleaned_{x}_{y}_{id}.geojson`  
-        - `{AOI}/annotations/prepped_cleaned/buildings_cleaned_{x}_{y}_{id}.geojson`  
-        - `{AOI}/annotations/prepped_cleaned/roads_speed_{x}_{y}_{id}.geojson`  
-        - `{AOI}/annotations/prepped_cleaned/roads_speed_{x}_{y}_{id}.shp`  
-        - `{AOI}/annotations/prepped_cleaned/buildings_{x}_{y}_{id}.shp`  
-
-2. Create training and validation masks from the geojsons to use during training and validation.  
-`python baseline/data_prep/create_masks.py --root_dir /path/to/spacenet8/aws/data/download --aoi_dirs Germany_Training_Public Louisiana-East_Training_Public`
-
-    Four masks are generated during this process:  
-        - binary building mask (0 non-building, 1 building)  
-        - binary road mask (0 non-building, 1 building)  
-        - 8-channel road speed mask  
-        - 4-channel flood mask  
-
-3. Create a random train/val split to train the models on
-`python baseline/data_prep/generate_train_val_test_csvs.py --root_dir /path/to/spacenet8/aws/data/download --aoi_dirs Germany_Training_Public Louisiana-East_Training_Public --out_csv_basename sn8_data --val_percent 0.15 --out_dir /path/to/output/folder/for/train/val/csvs`
-
-    This will create a csv file with filepaths to training images and labels and csv file with filepaths to validation images. It will do a random train/val split. These csvs are used by the dataloader during training. 
-
-### Train/Validate Foundation Features Network  
-`python baseline/train_foundation_features.py --train_csv /path/to/train.csv --val_csv /path/to/val.csv --save_dir /path/to/save/directory/foundation --model_name resnet34 --lr 0.0001 --batch_size 2 --n_epochs 50 --gpu 0`
-
-### Inference with Foundation Features Network  
-1. Write prediction tiffs to be used for postprocessing and generating the submission .csv  
-`python baseline/foundation_eval.py --model_path /path/to/saved/foundation/best_model.pth --in_csv /path/to/val/or/test.csv --save_preds_dir /path/to/output/foundation/eval_test --gpu 0 --model_name resnet34`  
-
-2. Write prediction .pngs for visual inspection of predictions  
-`python baseline/foundation_eval.py --model_path /path/to/saved/foundation/best_model.pth --in_csv /path/to/val/or/test.csv --save_fig_dir /path/to/output/foundation/eval_test/pngs --gpu 0 --model_name resnet34`  
-
-### Train/Validate Flood Features Network  
-`python baseline/train_flood.py --train_csv /path/to/train.csv --val_csv /path/to/val.csv --save_dir /path/to/save/directory/flood --model_name resnet34_siamese --lr 0.0001 --batch_size 2 --n_epochs 50 --gpu 0`  
-
-### Inference With Flood Features Network
-1. Write prediction tiffs to be used for postprocessing and generating the submission .csv  
-    `python baseline/flood_eval.py --model_path /path/to/saved/flood/best_model.pth --in_csv /path/to/val/or/test.csv --save_preds_dir /path/to/output/flood/eval_test --gpu 0 --model_name resnet34_siamese`    
-
-2. Write prediction .pngs for visual inspection of predictions  
-    `python lib/flood_eval.py --model_path /path/to/saved/flood/best_model.pth --in_csv /path/to/val/or/test.csv --save_fig_dir /path/to/output/flood/eval_test/pngs --gpu 0 --model_name resnet34_siamese`    
-
-### Postprocessing
-Any of the following postprocessing steps require that you have run inference with the flood features network and foundation features network. As input, the postprocessing requires the geotiff predictions.  
-
-##### Roads
-1. Skeletonize road raster predictions and convert to vector data.  
-    `python baseline/postprocessing/roads/vectorize_roads.py --im_dir /path/to/road/prediction/geotiffs --out_dir /path/to/road/prediction/geotiffs --write_shps --write_graphs --write_csvs --write_skeletons`
-2. Generate road network graph from vector data  
-    `python baseline/postprocessing/roads/wkt_to_G.py --wkt_submission /path/to/output/csv/from/last/step --graph_dir /output/path/to/save/simplified/graphs --log_file /path/to/log`
-3. Assign road speed predictions to road network graph linestrings  
-    `python baseline/postprocessing/roads/infer_speed.py `
-4. Generate the road submission .csv  
-    `python baseline/postprocessing/roads/create_submission.py`
-
-To run all these steps, see the script `/baseline/postprocessing/roads/road_post.sh`. Change only the variables:  
-    EVAL_CSV  
-    ROAD_PRED_DIR  
-    FLOOD_PRED_DIR  
-
-##### Buildings
-1. Merge the building predictions from the foundation features network with the flooded predictions from the flood features network to attribute buildings as flooded or non-flooded. Polygonize the building prediction raster, remove polygons below a certain area threshold and simplify polygon geometries.  
-    `python baseline/postprocessing/buildings/building_postprocessing.py --root_dir /path/to/foundation/features/building/prediction/geotiffs --flood_dir /path/to/flood/prediction/geotiffs --out_submission_csv /path/to/output/building_submission.csv --out_shapefile_dir /path/to/output/building/pred_shps --square_size 5 --simplify_tolerance 0.75 --min_area 5 --perc_positive 0.5`
-
-### Submission
-Your submission files should be in the following format.
-
-| ImageId | Object | Flooded | Wkt_Pix | Wkt_Geo |
-| ------ | ------ | ------ | ------ | ------ |
-
-ImageId is the reference image for the prediction. Object should be either "Building" or "Road". Flooded should be set to "True" or "False". Wkt_Pix is well-known-text format for coordinates as (row, col) of the predictions in reference to the image. Wkt_Geo is well-known-text coordinates of the predictions in WGS84 (x, y). 
-
-Example for buildings: 
-| ImageId | Object | Flooded | Wkt_Pix | Wkt_Geo |
-| ------ | ------ | ------ | ------ | ------ |
-| 104001006504F400_0_11_20 | Building | Null | POLYGON EMPTY | POLYGON EMPTY |
-| 104001006504F400_0_10_29 | Building | FALSE | POLYGON ((6 706, 0 708, 0 715, 9 719, 12 706, 6 706)) | POLYGON ((-90.4706194788189 29.8296995794957,-90.4706358281571 29.8296930397604,-90.4706390980247 29.8296668808194,-90.4706063993484 29.8296570712164,-90.4705965897455 29.8296963096281,-90.4706194788189 29.8296995794957)) |  
-
-
-### References and Resources
-1. SpaceNet-8 workshop paper: https://openaccess.thecvf.com/content/CVPR2022W/EarthVision/papers/Hansch_SpaceNet_8_-_The_Detection_of_Flooded_Roads_and_Buildings_CVPRW_2022_paper.pdf
-
-2. The preprocessing for road speed labels, road speed training, and road speed post-processing leverages: https://github.com/avanetten/cresi  
-
-3. See the following paper for more information on the road speed segmentation: https://openaccess.thecvf.com/content_WACV_2020/html/Van_Etten_City-Scale_Road_Extraction_from_Satellite_Imagery_v2_Road_Speeds_and_WACV_2020_paper.html  
-
-3. SpaceNet 5 blogs for road speed estimation: https://spacenet.ai/sn5-challenge/
+2. [R. Hänsch, J. Arndt, M. Gibb, A. Boedihardjo, T. Pedelose and T. M. Bacastow, "The SpaceNet 8 Challenge - From Foundation Mapping to Flood Detection," IGARSS 2022 - 2022 IEEE International Geoscience and Remote Sensing Symposium, Kuala Lumpur, Malaysia, 2022, pp. 5073-5076, doi: 10.1109/IGARSS46834.2022.9883741.](https://ieeexplore.ieee.org/abstract/document/9883741)

@@ -1,0 +1,1 @@
+--ipc=host --shm-size=64G --gpus=all --net=host

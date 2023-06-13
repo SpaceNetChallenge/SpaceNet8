@@ -1,0 +1,26 @@
+fold_index: 3
+training:
+  batch_size: 512
+  optimizer: Adam
+  optimizer_params:
+    lr: 0.002
+    weight_decay: 1.0e-7
+  lr_scheduler: OneCycleLR
+  lr_scheduler_params:
+    max_lr: 0.0055
+    pct_start: 0.1
+    div_factor: 1.0e+3
+  lr_scheduler_trigger: [1, "iteration"]
+  objective: rmspe
+  progress_bar: True
+  nb_epoch: 30
+model:
+  class_name: MLP
+  num_dim: -1  # dummy
+  cat_sizes: [128]
+  cat_emb_dims: [30]
+  hidden_dim: 256
+  output_dim: 1
+  dropout_cat: 0.0
+  dropout_hidden: 0.0
+  bn: True

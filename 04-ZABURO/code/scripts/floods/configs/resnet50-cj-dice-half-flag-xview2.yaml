@@ -1,0 +1,21 @@
+fold_index: 0
+training:
+  batch_size: 8
+  batch_size_valid: 4
+  optimizer: Adam
+  optimizer_params:
+    lr: 1.0e-4
+    weight_decay: 1.0e-7
+  num_workers: 4
+  lr_scheduler: cos
+  progress_bar: True
+  nb_epoch: 148  # 37 * 4
+  eval_trigger: [1000, "epoch"]  # no eval
+model:
+  class_name: UnetSiamese
+  encoder_name: resnet50
+bce_weight: 1.0
+dice_weight: 1.0
+ratio_to_flooded: 0.5
+image_level_bce_weight: 1.0
+use_xview2: True

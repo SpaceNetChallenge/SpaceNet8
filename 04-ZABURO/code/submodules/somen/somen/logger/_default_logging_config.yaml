@@ -1,0 +1,50 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  plain-formatter:
+    format: "[%(levelname)s %(asctime)s %(name)s:%(funcName)s L%(lineno)d] %(message)s"
+  default-formatter:
+    class: colorlog.ColoredFormatter
+    format: "[%(log_color)s%(levelname)s%(reset)s %(asctime)s %(name)s L%(lineno)d] %(log_color)s%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  green-formatter:
+    class: colorlog.ColoredFormatter
+    format: "[%(log_color)s%(levelname)s%(reset)s %(asctime)s %(green)s%(name)s L%(lineno)d%(reset)s] %(log_color)s%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  blue-formatter:
+    class: colorlog.ColoredFormatter
+    format: "[%(log_color)s%(levelname)s%(reset)s %(asctime)s %(blue)s%(name)s L%(lineno)d%(reset)s] %(log_color)s%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+handlers:
+  default-handler:
+    class: colorlog.StreamHandler
+    formatter: default-formatter
+    level: DEBUG
+  green-handler:
+    class: colorlog.StreamHandler
+    formatter: green-formatter
+    level: DEBUG
+  blue-handler:
+    class: colorlog.StreamHandler
+    formatter: blue-formatter
+    level: DEBUG
+
+root:
+  level: WARNING
+  handlers:
+    - default-handler
+
+loggers:
+  __main__:
+    level: DEBUG
+    handlers:
+      - green-handler
+    propagate: no
+
+  somen:
+    level: DEBUG
+    handlers:
+      - blue-handler
+    propagate: no

@@ -1,0 +1,1 @@
+--shm-size 32G --gpus all

@@ -1,0 +1,6 @@
+General:
+  enable_ema: true
+  ema_momentum: 1e-2
+  epochs: 80
+Scheduler:
+  multistep_milestones: [10000]  # constant lr

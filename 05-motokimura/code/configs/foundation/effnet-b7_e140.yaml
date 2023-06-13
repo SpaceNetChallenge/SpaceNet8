@@ -1,0 +1,10 @@
+Dataloader:
+  train_batch_size: 8
+Transform:
+  train_random_crop_size: [448, 448]
+Model:
+  encoder: timm-efficientnet-b7
+General:
+  epochs: 140
+Scheduler:
+  multistep_milestones: [80, 120]

@@ -1,0 +1,19 @@
+fold_index: 0
+training:
+  batch_size: 8
+  batch_size_valid: 8
+  optimizer: Adam
+  optimizer_params:
+    lr: 1.0e-4
+    weight_decay: 1.0e-7
+  num_workers: 4
+  lr_scheduler: cos
+  progress_bar: True
+  nb_epoch: 296  # 37 * 8
+  eval_trigger: [1000, "epoch"]  # no eval
+model:
+  class_name: Unet
+  encoder_name: tu-tf_efficientnetv2_m
+resume: True
+output_type: speed-and-junction
+junction_loss_weight: 0.1

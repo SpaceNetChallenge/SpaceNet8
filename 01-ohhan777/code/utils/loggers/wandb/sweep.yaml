@@ -1,0 +1,57 @@
+# Hyperparameters for training
+# To set range-
+# Provide min and max values as:
+#      parameter:
+#
+#         min: scalar
+#         max: scalar
+# OR
+#
+# Set a specific list of search space-
+#     parameter:
+#         values: [scalar1, scalar2, scalar3...]
+#
+# You can use grid, bayesian and hyperopt search strategy
+# For more info on configuring sweeps visit - https://docs.wandb.ai/guides/sweeps/configuration
+
+program: utils/loggers/wandb/sweep.py
+method: random
+metric:
+  name: val/m_iou
+  goal: maximize
+
+parameters:
+  # hyperparameters: set either min, max range or values list
+  batch_size:
+    values: [64]
+  epochs:
+    values: [20]
+
+  lr0:
+    distribution: uniform
+    min: 1e-5
+    max: 1e-1
+  lrf:
+    distribution: uniform
+    min: 0.01
+    max: 1.0
+  momentum:
+    distribution: uniform
+    min: 0.6
+    max: 0.98
+  weight_decay:
+    distribution: uniform
+    min: 0.0
+    max: 0.001
+  warmup_epochs:
+    distribution: uniform
+    min: 0.0
+    max: 5.0
+  warmup_momentum:
+    distribution: uniform
+    min: 0.0
+    max: 0.95
+  warmup_bias_lr:
+    distribution: uniform
+    min: 0.0
+    max: 0.2
