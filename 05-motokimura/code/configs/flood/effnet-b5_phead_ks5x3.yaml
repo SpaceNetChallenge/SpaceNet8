@@ -1,0 +1,12 @@
+Dataloader:
+  train_batch_size: 8
+  val_batch_size: 4
+  test_batch_size: 4
+Transform:
+  train_random_crop_size: [320, 320]
+Model:
+  encoder: timm-efficientnet-b5
+  n_siamese_head_convs: 1
+  siamese_head_kernel_size_last: 3
+  enable_siamese_post_head: true
+  post_head_kernel_size: 5

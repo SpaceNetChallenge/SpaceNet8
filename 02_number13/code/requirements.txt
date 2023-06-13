@@ -1,0 +1,17 @@
+Pillow
+matplotlib
+opencv-python
+numpy
+pandas
+scipy
+datetime
+scikit-image
+torch
+scikit-learn
+albumentations
+pretrainedmodels
+timm
+efficientnet-pytorch
+segmentation-models-pytorch==0.2.1
+torchvision
+tqdm

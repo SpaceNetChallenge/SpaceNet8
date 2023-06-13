@@ -1,0 +1,44 @@
+{
+  "root_dirs": {"buildings" : "/wdata/spacenet-dataset/buildings",
+    "roads" : "/wdata/spacenet-dataset/roads" },
+
+  "buildings_imgdir" : "PS-RGB-u8",
+  "roads_imgdir" : "PS-RGB-u8",
+  "offnadir_imgdir" : "PS-RGB-u8",
+  "sp5_imgdir" : "PS-RGB-u8",
+  "offnadir_prefix_add": "Pan-Sharpen_",
+  "sp5_postfix_add" : "_PS-RGB_",
+
+  "padding": 22,
+  "eval_rows": 1344,
+  "eval_cols": 1344,
+
+  "batch_size": 8,
+  "num_workers": 8,
+  "iter_size": 1,
+  "lr": 0.0001,
+  "lr_steps": [20, 25],
+  "lr_gamma": 0.2,
+  "test_pad": 64,
+  "epoch_size": 8,
+
+  "target_cols": 512,
+  "target_rows": 512,
+
+  "optimizer": "Adam",
+
+  "nb_epoch": 37,
+  "no_eval_period": 27,
+
+  "road_loss_weight" : 0.5,
+  "building_loss_weight" : 0.5,
+
+  "model_name": "resnet50",
+  "model_outdir" : "/wdata",
+
+  "sn8:root_dir" : "/wdata",
+  "sn8:mask_dir_name" : "masks_png",
+  "sn8:train_csv" : "./train_val_csvs/sn8_data_train_fold1.csv",
+  "sn8:val_csv":  "./train_val_csvs/sn8_data_val_fold1.csv"
+
+}

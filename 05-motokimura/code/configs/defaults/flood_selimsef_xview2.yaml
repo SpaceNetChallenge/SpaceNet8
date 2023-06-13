@@ -1,0 +1,110 @@
+Data:
+  train_dir: /data/train
+  test_dir: /data/test
+  artifact_dir: /wdata
+  fold_ver: folds_v3
+  pre_image_blacklist: [
+    # Foundation error:
+    # - Louisiana-East_Training_Public
+    10300100AF395C00_2_18_35.tif,  # building FN
+    10300100AF395C00_2_19_35.tif,  # building FN
+    10400100684A4B00_1_22_70.tif,  # building FN
+    10400100684A4B00_1_23_70.tif,  # building FN
+    10400100684A4B00_1_24_70.tif,  # building FN
+    10400100684A4B00_1_25_70.tif,  # building FN
+    10400100684A4B00_1_26_70.tif,  # building FN
+    #10400100684A4B00_1_2_84.tif,  # building FN
+    # Flood error:
+    # - Germany_Training_Public
+    10500500C4DD7000_0_26_62.tif,  # warping
+    10500500C4DD7000_0_27_62.tif,  # warping
+    10500500C4DD7000_0_27_63.tif,  # flood road FP
+    10500500C4DD7000_0_27_64.tif,  # flood road FP
+    10500500C4DD7000_0_29_70.tif,  # warping
+    10500500C4DD7000_0_30_70.tif,  # warping
+    # - Louisiana-East_Training_Public
+    10300100AF395C00_2_13_45.tif,  # flood road & building FN
+    10300100AF395C00_2_13_46.tif,  # flood building FN
+    10300100AF395C00_2_13_47.tif,  # flood road & building FN
+    10300100AF395C00_2_14_46.tif,  # flood building FN
+    10300100AF395C00_2_22_43.tif,  # flood road & building FN
+    105001001A0FFC00_0_12_13.tif,  # flood road FN
+    105001001A0FFC00_0_16_14.tif,  # flood road FN
+    105001001A0FFC00_0_17_15.tif,  # flood road FN
+    105001001A0FFC00_0_20_17.tif,  # flood road & building FN
+    10400100684A4B00_1_15_88.tif,  # flood road FN
+    10400100684A4B00_1_15_93.tif,  # flood road FN
+    10400100684A4B00_1_16_73.tif,  # flood road FN
+    10400100684A4B00_1_20_82.tif,  # flood building FN
+    10400100684A4B00_1_21_79.tif,  # flood building FN
+    10400100684A4B00_1_21_86.tif,  # flood building FN
+    10400100684A4B00_1_22_79.tif,  # flood building FN
+    10400100684A4B00_1_23_78.tif,  # flood road & building FN
+    10400100684A4B00_1_23_79.tif,  # flood road & building FN
+  ]
+  use_mosaic_for_train: True
+Dataloader:
+  train_batch_size: 10
+  train_num_workers: 6
+  val_batch_size: 4
+  val_num_workers: 6
+  test_batch_size: 4
+  test_num_workers: 6
+Transform:
+  train_random_crop_size: [352, 352]
+  train_random_flip_prob: 0.0  # both of horizontal and vertical flip
+  train_random_horizontal_flip_prob: 0.0
+  train_random_vertical_flip_prob: 0.0
+  train_random_rotate90_prob: 0.0
+Model:
+  type: selimsef_xview2_siamese_densenet161
+  arch: unet
+  encoder: timm-efficientnet-b3
+  n_input_post_images: 1
+  n_siamese_head_convs: 2
+  siamese_head_kernel_size: 3  # valid when n_siamese_head_convs>=2
+  siamese_head_kernel_size_last: 1
+  siamese_head_dilation_last: 1
+  siamese_head_module: 'conv'  # valid when n_siamese_head_convs>=2. 'conv', 'conv_relu', or 'conv_bn_relu'
+  enable_siamese_post_head: false
+  post_head_kernel_size: 3  # valid when enable_siamese_post_head = true
+  post_head_module: 'conv'  # valid when enable_siamese_post_head = true
+  n_post_head_modules: 1  # valid when enable_siamese_post_head = true
+  train_post_select_method: less_mse_prob  # valid when n_input_post_images=1 [always_post1, less_mse, or less_mse_prob] 
+  test_post_select_method: less_mse  # valid when n_input_post_images=1 [always_post1 or less_mse]
+Class:
+  groups: [building]
+  classes:
+    building: [flood_building, not_flood_building]
+  class_weights:
+    building: [1.0, 1.0]
+  losses:
+    building: [dice, bce]
+  loss_weights:
+    building: [1.0, 1.0]
+Optimizer:
+  type: adam
+  lr: 1e-5  # 2e-4 might be better if train from scratch
+  weight_decay: 0
+Scheduler:
+  type: multistep
+  multistep_milestones: [60]
+  multistep_gamma: 0.1
+  annealing_t_max: 120
+  annealing_eta_min: 0.0
+General:
+  gpus: [0]
+  epochs: 80
+  fp16: true
+  amp_backend: native # valid when fp16=true
+  amp_level: null # valid when amp_backend=apex
+  seed: 777
+  deterministic: true
+  benchmark: false
+  check_val_every_n_epoch: 1
+  val_metric_to_monitor: val/iou_flood
+  enable_ema: false
+  ema_momentum: 2e-3  # valid when enable_ema=true
+  enable_swa: false
+  swa_lr: 1e-4  # valid when enable_swa=true
+  swa_epoch_start: 90  # valid when enable_swa=true

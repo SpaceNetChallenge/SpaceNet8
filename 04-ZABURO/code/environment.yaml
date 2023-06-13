@@ -1,0 +1,55 @@
+name: sn8
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.8
+  - pip
+  - numpy
+  - scipy
+  - pandas
+  # Machine Learning
+  - pytorch::pytorch
+  - pytorch::torchvision
+  - albumentations
+  - scikit-learn
+  # Geo
+  - libgdal
+  - gdal
+  - fiona
+  - geopandas=0.11.1
+  - rasterio
+  - shapely
+  - osmnx=1.2.1
+  # Image, CV
+  - opencv
+  - scikit-image
+  - pillow
+  # Visualization
+  - jupyter
+  - jupyterlab
+  - plotly::plotly
+  - jupyterlab_widgets
+  - ipywidgets
+  - matplotlib
+  # Misc
+  - pyyaml
+  - networkx
+  - statsmodels
+  - feather-format
+  - tqdm
+  - ipykernel
+  - h5py
+  - requests
+  - cython
+  - numba
+  - utm
+  - pip:
+    - segmentation-models-pytorch==0.3.0
+    - mlflow
+    - tables
+    - dacite
+    - awscli
+    - pytorch-pfn-extras==0.5.8
+    - colorlog
+    - fire

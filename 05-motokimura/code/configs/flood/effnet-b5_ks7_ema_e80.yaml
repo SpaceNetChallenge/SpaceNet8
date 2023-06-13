@@ -1,0 +1,15 @@
+Dataloader:
+  train_batch_size: 8
+  val_batch_size: 4
+  test_batch_size: 4
+Transform:
+  train_random_crop_size: [320, 320]
+Model:
+  encoder: timm-efficientnet-b5
+  siamese_head_kernel_size: 7
+General:
+  enable_ema: true
+  ema_momentum: 2e-3
+  epochs: 80
+Scheduler:
+  multistep_milestones: [10000]  # constant lr

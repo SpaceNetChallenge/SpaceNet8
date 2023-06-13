@@ -1,0 +1,41 @@
+fold_index: 3
+training:
+  batch_size: 1280
+  optimizer: Adam
+  optimizer_params:
+    lr: 0.00038
+    weight_decay: 6.5e-6
+  lr_scheduler: ReduceLROnPlateau
+  lr_scheduler_params:
+    mode: min
+    min_lr: 1.0e-7
+    patience: 8
+    verbose: True
+    factor: 0.5
+  lr_scheduler_trigger: [1, "epoch"]
+  objective: rmspe
+  progress_bar: True
+  nb_epoch: 50
+model:
+  class_name: Tabular1DCNN
+  num_dim: -1  # dummy
+  cat_sizes: [128]
+  cat_emb_dims: [30]
+  input_dropout: 0.0
+  input_channel: 128
+  input_length: 8
+  input_celu: True
+  conv1:
+    out_channels: 384
+    kernel_size: 5
+    dropout: 0.0
+    bias: False
+  conv2:
+    out_channels: 384
+    kernel_size: 3
+    dropout: 0.0
+  conv3: null
+  conv4: null
+  dense_dropout: 0.0
+  dense_act: null
+  output_dim: 1
