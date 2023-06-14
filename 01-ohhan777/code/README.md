@@ -43,7 +43,3 @@ wget http://ohhan.net/wordpress/wp-content/uploads/2022/08/best_flood.pt
 
 These files should be copied to /kari-spacenet8/runs/train/weights/ for further processing.
 
-## Questions
-
-If you have any questions about the code, please feel free to contact me at ohhan777@gmail.com.
-
